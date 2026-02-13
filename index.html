@@ -1,1 +1,37 @@
-<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Improved Mobile Responsive Design</title>\n    <style>\n        body {\n            font-family: Arial, sans-serif;\n            margin: 0;\n            padding: 0;\n        }\n        header {\n            background-color: #f8f9fa;\n            padding: 10px;\n            text-align: center;\n        }\n        button {\n            padding: 10px 15px;\n            font-size: 16px;\n        }\n        input[type="text"], input[type="email"] {\n            width: 90%;\n            padding: 8px;\n            font-size: 16px;\n        }\n        @media (max-width: 768px) {\n            header {\n                padding: 20px;\n            }\n            button {\n                width: 100%;\n                font-size: 18px;\n                padding: 12px;\n            }\n            input[type="text"], input[type="email"] {\n                width: 95%;\n                font-size: 18px;\n                padding: 10px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <header>\n        <h1>Welcome to My Website</h1>\n    </header>\n    <main>\n        <form>\n            <input type="text" placeholder="Enter your name">\n            <input type="email" placeholder="Enter your email">\n            <button type="submit">Submit</button>\n        </form>\n    </main>\n</body>\n</html>\n
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Day</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffeef8;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #ff69b4;
+        }
+        .heart {
+            color: red;
+            font-size: 50px;
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 24px;
+            }
+            .heart {
+                font-size: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Happy Valentine's Day!</h1>
+    <p>Sending you lots of love on this special day! ❤️</p>
+    <div class="heart">💖💕</div>
+</body>
+</html>
