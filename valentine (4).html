@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Твоя валентинка — интерактив</title>
+  <style>
+    :root{
+      --bg:#fff4f8; --accent:#ff2f5f; --muted:#6b6b6b; --card:#fff; 
+      --max-width:980px; --glass: rgba(255,255,255,0.7);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#ffe6f0 0%, #ffd4e8 100%);display:flex;align-items:center;justify-content:center}
+    .page{width:calc(100% - 20px);max-width:var(--max-width);background:var(--glass);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,0.10);overflow:hidden;position:relative;margin:10px}
+    header{padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+    h1{margin:0;color:var(--accent);font-size:18px}
+    h2{font-size:22px;color:#333;margin:10px 0}
+    h3{font-size:18px;color:#333;margin:8px 0}
+    p{font-size:16px;color:var(--muted);line-height:1.5}
+    main{padding:16px}
+    .center{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+    button.primary{background:var(--accent);color:white;border:none;padding:14px 24px;border-radius:12px;font-size:16px;cursor:pointer;font-weight:600;min-height:48px;min-width:120px;transition:transform 0.1s ease, box-shadow 0.1s ease}
+    button.primary:active{transform:scale(0.95)}
+    button.ghost{background:transparent;border:2px solid rgba(255,59,107,0.12);padding:10px 14px;border-radius:10px;font-size:14px;cursor:pointer;min-height:44px;transition:all 0.1s ease}
+    button.ghost:active{background:rgba(255,59,107,0.05)}
+    .screen{display:none;padding:12px}
+    .screen.active{display:block}
+    #gameArea{position:relative;height:260px;border-radius:12px;background:linear-gradient(180deg,#fff 0%,#fff5f8 100%);overflow:hidden;border:2px solid rgba(255,59,107,0.1)}
+    .heart{position:absolute;width:52px;height:52px;cursor:pointer;transform:translate(-50%,-50%);transition:transform 0.14s ease, filter 140ms}
+    .heart.gold{font-size:58px;filter:drop-shadow(0 6px 18px rgba(255,180,90,0.25))}
+    .hud{display:flex;gap:12px;align-items:center;margin-top:12px;justify-content:center;font-size:15px;flex-wrap:wrap}
+    .inputRow{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+    input[type=text]{padding:12px;border-radius:10px;border:2px solid #eee;min-width:200px;font-size:16px;flex:1;min-width:160px}
+    .ynWrap{display:flex;gap:16px;align-items:center;justify-content:center;margin-top:18px;flex-wrap:wrap}
+    #noBtn{opacity:0.9;filter:grayscale(0.1);padding:12px 20px}
+    #yesBtn{background:var(--accent);color:#fff;padding:14px 28px;border-radius:999px;border:none;font-weight:700;cursor:pointer;transition:transform 140ms ease, box-shadow 120ms ease;min-height:48px;font-size:16px}
+    .slideshow{max-width:760px;margin:0 auto;border-radius:12px;overflow:hidden;position:relative;width:100%}
+    .slides{display:flex;transition:transform .6s ease}
+    .slide{min-width:100%;height:360px;background-position:center;background-size:cover}
+    .slideNav{position:absolute;left:0;right:0;bottom:12px;display:flex;justify-content:center;gap:8px}
+    .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.8);opacity:0.6;cursor:pointer}
+    .dot.active{transform:scale(1.2);opacity:1}
+    .letter{padding:18px;border-radius:10px;background:linear-gradient(180deg,rgba(255,59,107,0.06),rgba(255,59,107,0.02));margin-top:12px;opacity:0;transform:translateY(6px);transition:opacity .5s ease, transform .5s ease;font-size:15px;line-height:1.6}
+    .letter.visible{opacity:1;transform:translateY(0)}
+    .cute-gif{width:120px;height:120px;margin:12px auto;border-radius:12px;object-fit:cover}
+    footer{padding:12px;text-align:center;color:var(--muted);font-size:12px;line-height:1.4}
+    .playerWrap{display:flex;gap:10px;align-items:center;justify-content:space-between;width:100%;margin-top:8px}
+    .playerControls{display:none;align-items:center;gap:8px;flex-wrap:wrap}
+    .playerControls button{padding:8px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:white;font-size:12px}
+    .volume{width:100px}
+    .wordPopup{position:absolute;pointer-events:none;font-weight:700;color:#ff2f5f;text-shadow:0 2px 6px rgba(0,0,0,0.12);transform:translate(-50%,0);opacity:0;transition:opacity .45s, transform .45s;font-size:14px}
+    #loveSlider{-webkit-appearance:none;appearance:none;background:transparent;outline:none}
+    #loveSlider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;background:#ff4d6d;cursor:pointer;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+    #loveSlider::-moz-range-thumb{width:20px;height:20px;background:#ff4d6d;cursor:pointer;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+    .revealBox{max-width:700px;margin:0 auto;padding:18px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.85),rgba(255,255,255,0.95));box-shadow:0 8px 30px rgba(0,0,0,0.06)}
+    .typewriter{font-size:18px;color:#333;min-height:40px;line-height:1.6}
+    #countdown{display:flex;align-items:center;justify-content:center;flex-direction:column}
+    .countBox{width:180px;height:180px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#fff 0%,#ffeef6 100%);box-shadow:0 10px 30px rgba(255,59,107,0.08);font-size:48px;color:var(--accent);font-weight:800}
+    .countLabel{margin-top:12px;color:var(--muted);font-size:14px}
+    #bgHearts{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:1}
+    #confettiCanvas{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none}
+    
+    /* MOBILE OPTIMIZATION */
+    @media (max-width:768px){
+      :root{--max-width:100%}
+      html,body{padding:0;margin:0;overflow-x:hidden}
+      .page{width:100%;max-width:100%;border-radius:0;margin:0;min-height:100vh;box-shadow:none}
+      header{padding:12px 16px;flex-direction:column;gap:8px}
+      h1{font-size:14px;line-height:1.3}
+      h2{font-size:20px}
+      h3{font-size:16px}
+      p{font-size:15px}
+      main{padding:12px 14px}
+      button.primary{padding:12px 20px;font-size:15px;min-height:46px}
+      button.ghost{padding:10px 12px;font-size:13px;min-height:42px}
+      .screen{padding:10px}
+      #gameArea{height:200px;min-height:200px}
+      .heart{width:46px;height:46px}
+      .heart.gold{font-size:50px}
+      .hud{font-size:14px;gap:8px}
+      .inputRow{gap:6px}
+      input[type=text]{padding:10px;font-size:15px;min-width:140px;min-height:44px}
+      .ynWrap{gap:12px}
+      #noBtn{padding:10px 16px;font-size:14px}
+      #yesBtn{padding:12px 20px;font-size:15px;min-height:46px}
+      .slide{height:240px}
+      .letter{padding:14px;font-size:14px;margin-top:10px}
+      .typewriter{font-size:16px}
+      .revealBox{padding:14px}
+      .countBox{width:140px;height:140px;font-size:40px}
+      .countLabel{margin-top:8px;font-size:13px}
+      footer{font-size:11px;padding:10px}
+      .playerWrap{flex-direction:column;width:100%;align-items:flex-start}
+      .playerControls{flex-direction:column;width:100%;align-items:flex-start;background:rgba(0,0,0,0.02);padding:8px;border-radius:8px}
+      .playerControls button{width:100%;text-align:left}
+      .volume{width:100%}
+      .wordPopup{font-size:13px}
+    }
+
+    @media (max-width:480px){
+      :root{--max-width:100%}
+      .page{border-radius:0;min-height:100vh}
+      header{padding:10px 12px;gap:6px}
+      h1{font-size:13px;line-height:1.3;word-wrap:break-word}
+      h2{font-size:18px}
+      h3{font-size:15px}
+      p{font-size:14px}
+      main{padding:10px}
+      button.primary{padding:11px 18px;font-size:14px;min-height:44px;width:100%;max-width:280px}
+      button.ghost{padding:9px 11px;font-size:12px;min-height:40px}
+      .screen{padding:8px}
+      #gameArea{height:180px}
+      .heart{width:42px;height:42px;font-size:40px}
+      .heart.gold{font-size:46px}
+      .hud{font-size:13px;gap:6px}
+      .inputRow{flex-direction:column;gap:8px;width:100%}
+      input[type=text]{width:100%;padding:10px;font-size:15px;min-height:44px}
+      button.primary{width:100%;max-width:280px;margin:0 auto}
+      .ynWrap{gap:10px;width:100%}
+      #noBtn{padding:10px 14px;font-size:13px;width:100%;max-width:140px}
+      #yesBtn{padding:11px 18px;font-size:14px;min-height:44px;width:100%;max-width:180px}
+      .slide{height:200px}
+      .letter{padding:12px;font-size:13px;line-height:1.5;margin-top:8px}
+      .typewriter{font-size:15px}
+      .revealBox{padding:12px}
+      .countBox{width:120px;height:120px;font-size:36px}
+      .countLabel{margin-top:6px;font-size:12px}
+      footer{font-size:10px;padding:8px;line-height:1.3}
+      .playerWrap{padding:8px;background:rgba(0,0,0,0.02);border-radius:8px}
+      .playerControls{padding:6px;gap:6px}
+      .playerControls button{font-size:11px;padding:6px 8px}
+      .volume{width:100%;height:28px}
+      .wordPopup{font-size:12px}
+    }
+
+    @media (max-width:360px){
+      h1{font-size:12px;line-height:1.3}
+      h2{font-size:16px}
+      p{font-size:13px}
+      main{padding:8px}
+      button.primary{padding:10px 14px;font-size:13px}
+      input[type=text]{font-size:14px;padding:8px}
+      .countBox{width:110px;height:110px;font-size:32px}
+    }
+
+    /* Улучшение для касания (touch devices) */
+    @media (hover: none) and (pointer: coarse) {
+      button{padding-bottom:calc(var(--safe-area-inset-bottom) + 1px)}
+      input[type=text]{font-size:16px}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bgHearts"></canvas>
+  <canvas id="confettiCanvas"></canvas>
+  <div class="page" role="application" aria-label="Интерактивная валентинка">
+    <header>
+      <div style="display:flex;gap:10px;align-items:center">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M12 21s-7.5-4.35-9.5-7.25C-0.85 8.55 5 3.5 8.5 6.25 10.2 7.6 12 9 12 9s1.8-1.4 3.5-2.75C19 3.5 24.85 8.55 21.5 13.75 19.5 16.65 12 21 12 21z" fill="#FF4D6D"/>
+        </svg>
+        <div>
+          <h1>Для моей Малечки от Джаки</h1>
+          <div style="color:var(--muted);font-size:13px">Проходи этапы и увидишь письмо</div>
+        </div>
+      </div>
+      <div class="playerWrap">
+        <button id="musicToggle" class="ghost">🎵 Плеер</button>
+        <div id="playerControls" class="playerControls">
+          <button id="playBtn" class="ghost">▶ Играть</button>
+          <button id="pauseBtn" class="ghost">⏸ Пауза</button>
+          <button id="stopBtn" class="ghost">⏹ Стоп</button>
+          <input id="volRange" class="volume" type="range" min="0" max="100" value="45" aria-label="Громкость" />
+        </div>
+      </div>
+    </header>
+    <main>
+      <!-- Экран 1: Приветствие -->
+      <section id="landing" class="screen active center">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDhkdGN5dG5vbGw3OWt6OGU3Z3JqYmRoYm1lY2Ftb2Fua2E5djRsZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xULW8MYvpNOfMXfDH2/giphy.gif" class="cute-gif" alt="love">
+        <h2>Хочешь сыграть? ❤️</h2>
+        <p>Нажми <strong>Начать</strong> — будет мило, весело и романтически 💕</p>
+        <button id="startBtn" class="primary">Начать приключение</button>
+      </section>
+
+      <!-- Экран 2: Игра -->
+      <section id="game" class="screen center">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYTRsaHBzNGZocHg2aGtkZnR6dG9qc2NpdGJ3bXdoNm9hNXM1cnFuZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oz8xIsloV7zOoTqDu/giphy.gif" class="cute-gif" alt="hearts">
+        <h2>Поймай 10 сердечек! 💕</h2>
+        <p>Кликай по сердечкам. Золотое сердечко даёт +3 очка!</p>
+        <div id="gameArea"></div>
+        <div class="hud">
+          <div>❤️ <strong id="score">0</strong> / 10</div>
+          <div>⏱ <strong id="timer">30</strong> сек</div>
+          <button id="restartGame" class="ghost" style="display:none">🔄 Заново</button>
+        </div>
+      </section>
+
+      <!-- Экран 3: Секретный вопрос 1 -->
+      <section id="secret" class="screen center">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGw4OXRnZWlvZzNqeHZ4Y2MyZXJvcnN0aWJ2NmpvYjNjdmw3dGFtciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0HlUJZE8Uo1cSlUI/giphy.gif" class="cute-gif" alt="eyes">
+        <h2>Секретный вопрос 🤔</h2>
+        <p>Во что я влюбился в тебе в первую нашу встречу?</p>
+        <div class="inputRow">
+          <input id="secretInput" type="text" placeholder="Твой ответ..." />
+          <button id="secretBtn" class="primary">Проверить</button>
+        </div>
+        <p id="secretFeedback" style="color:var(--accent);margin-top:8px"></p>
+        <p id="secretHint" style="color:#ff9800;margin-top:8px;display:none">💡 Подсказка: Что у тебя огненное?</p>
+      </section>
+
+      <!-- Экран 4: Ползунок -->
+      <section id="slider" class="screen center">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExd2JuaWp5cnNrOHltZ3lqYWhrM29mNnRpbTVubmJlM3R1anBtdnpodyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ohs7YQ5LUM8kNJZzG/giphy.gif" class="cute-gif" alt="running">
+        <h2>Помоги мне добежать до тебя! 🏃‍♂️💕</h2>
+        <p>Передвинь ползунок до конца...</p>
+        <div style="width:100%;max-width:500px;margin:20px auto;position:relative">
+          <div style="background:#ffe6f0;height:80px;border-radius:40px;position:relative;overflow:hidden;border:3px solid rgba(255,59,107,0.2)">
+            <div id="sliderProgress" style="position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg, #ff4d6d, #ff7aa2);width:0%;transition:width 0.1s;border-radius:40px"></div>
+            <div id="runnerEmoji" style="position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:50px;transition:left 0.1s">🏃‍♂️</div>
+            <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:50px">👩‍🦰</div>
+          </div>
+          <input id="loveSlider" type="range" min="0" max="100" value="0" style="width:100%;margin-top:10px;height:40px;-webkit-appearance:none;background:transparent;cursor:pointer">
+        </div>
+        <p id="sliderFeedback" style="color:var(--accent);margin-top:8px"></p>
+      </section>
+
+      <!-- Экран 5: Секретный вопрос 2 -->
+      <section id="secret2" class="screen center">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcmJsMHRqcm00eWtsOGtkdmo4Y3FjMmM5OTB4azZhcjBqcGhzMmN0MCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26BRuo6sLetdllPAQ/giphy.gif" class="cute-gif" alt="moon">
+        <h2>Ещё один вопрос... 🌙</h2>
+        <p>Луна сегодня красивая, не так ли?</p>
+        <div class="inputRow">
+          <input id="secret2Input" type="text" placeholder="Твой ответ..." />
+          <button id="secret2Btn" class="primary">Ответить</button>
+        </div>
+        <p id="secret2Feedback" style="color:var(--accent);margin-top:8px"></p>
+      </section>
+
+      <!-- Экран 6: Печатающееся послание -->
+      <section id="reveal" class="screen center">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNnZxYWlsZGhpYW5wdTI5enZ1OThrNDB4YnQ1cGtjeWx3czhhdnN0ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3og0IDyqVFNH7qFpAI/giphy.gif" class="cute-gif" alt="love letter">
+        <div class="revealBox">
+          <div id="typewriter" class="typewriter"></div>
+        </div>
+      </section>
+
+      <!-- Экран 7: Обратный отсчёт -->
+      <section id="countdown" class="screen center">
+        <h2>Приготовься... 💖</h2>
+        <div class="countBox">
+          <span id="countVal">3</span>
+        </div>
+        <p class="countLabel">До главного вопроса...</p>
+      </section>
+
+      <!-- Экран 8: Главный вопрос -->
+      <section id="final" class="screen center">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOXNrZHlsMGV2cWdrbWJyY3o5bDYzdnVwazFrbXhyazZ6c2Z6eWFhYSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26u4cqiYI30juCOGY/giphy.gif" class="cute-gif" alt="proposal">
+        <h2 style="font-size:28px">Будешь моей валентинкой? 💝</h2>
+        <p>Ну что, ответишь честно?</p>
+        <div class="ynWrap">
+          <button id="noBtn" class="ghost">Нет 😔</button>
+          <button id="yesBtn">Да! 💕</button>
+        </div>
+      </section>
+
+      <!-- Экран 9: Слайдшоу и письмо -->
+      <section id="slideshow" class="screen center">
+        <h2>Для тебя ❤️</h2>
+        <div class="slideshow">
+          <div id="slides" class="slides">
+            <div class="slide" style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%)"></div>
+            <div class="slide" style="background:linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"></div>
+            <div class="slide" style="background:linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"></div>
+            <div class="slide" style="background:linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"></div>
+          </div>
+          <div id="dots" class="slideNav"></div>
+        </div>
+        <div id="letter" class="letter">
+          <p style="margin:0 0 12px 0;font-weight:600;color:#333">Моей самой любимой,</p>
+          <p style="margin:8px 0">Каждый день с тобой — это как новая страница в самой красивой книге, которую я когда-либо читал. Ты делаешь обычные моменты особенными, а особенные — незабываемыми.</p>
+          <p style="margin:8px 0">Твоя улыбка освещает даже самые серые дни, а твой смех — это моя любимая мелодия. Спасибо тебе за то, что ты есть, за то, что ты со мной.</p>
+          <p style="margin:8px 0">Я люблю тебя больше, чем слова могут выразить. Ты — моё вдохновение, моя радость, моя любовь.</p>
+          <p style="margin:12px 0 0 0;text-align:right;font-style:italic;color:var(--accent)">С любовью, твой ❤️</p>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <p>Сделано с ❤️ специально для Малечки! • С Днём Святого Валентина!</p>
+    </footer>
+  </div>
+
+  <script>
+  // ============ НАСТРОЙКИ ============
+  const SECRET_ANSWER = 'глаза'; // первый секретный вопрос
+  const SECRET_ANSWER_2 = 'всегда'; // второй секретный вопрос
+  
+  // Слова для игры с сердечками
+  const LOVE_WORDS = [
+    'Смех', 'Объятия', 'Дурашка', 'Улыбка', 'Доброта', 
+    'Красота', 'Нежность', 'Забота', 'Глаза', 'Голос',
+    'Энергия', 'Тепло', 'Счастье', 'Любовь', 'Радость'
+  ];
+
+  // ============ УТИЛИТЫ ============
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ============ МУЗЫКА ============
+  let bgm = null;
+  let scWidget = null;
+  let scReady = false;
+
+  const musicToggle = document.getElementById('musicToggle');
+  const playerControls = document.getElementById('playerControls');
+  const playBtn = document.getElementById('playBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const volRange = document.getElementById('volRange');
+
+  musicToggle.addEventListener('click', () => {
+    const isVisible = playerControls.style.display !== 'none' && playerControls.style.display !== '';
+    playerControls.style.display = isVisible ? 'none' : 'flex';
+  });
+
+  // Простая фоновая музыка
+  playBtn.addEventListener('click', () => {
+    if (!bgm) {
+      // Используем рабочий CDN с романтичной музыкой
+      bgm = new Audio('https://www.bensound.com/bensound-music/bensound-tenderness.mp3');
+      bgm.loop = true;
+      bgm.volume = volRange.value / 100;
+    }
+    bgm.play().catch(err => {
+      console.log('Не удалось воспроизвести:', err);
+    });
+  });
+
+  pauseBtn.addEventListener('click', () => {
+    if (bgm) bgm.pause();
+  });
+
+  stopBtn.addEventListener('click', () => {
+    if (bgm) {
+      bgm.pause();
+      bgm.currentTime = 0;
+    }
+  });
+
+  volRange.addEventListener('input', (e) => {
+    if (bgm) bgm.volume = e.target.value / 100;
+  });
+
+  // ============ ФОНОВЫЕ СЕРДЕЧКИ ============
+  const bgCanvas = document.getElementById('bgHearts');
+  const bgCtx = bgCanvas.getContext('2d');
+  let bgHearts = [];
+
+  function resizeBgCanvas() {
+    bgCanvas.width = window.innerWidth;
+    bgCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeBgCanvas);
+  resizeBgCanvas();
+
+  for (let i = 0; i < 15; i++) {
+    bgHearts.push({
+      x: Math.random() * bgCanvas.width,
+      y: Math.random() * bgCanvas.height,
+      size: 12 + Math.random() * 20,
+      speed: 0.3 + Math.random() * 0.8,
+      opacity: 0.1 + Math.random() * 0.15
+    });
+  }
+
+  function animateBgHearts() {
+    bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+    bgHearts.forEach(h => {
+      h.y -= h.speed;
+      if (h.y < -50) {
+        h.y = bgCanvas.height + 50;
+        h.x = Math.random() * bgCanvas.width;
+      }
+      bgCtx.globalAlpha = h.opacity;
+      bgCtx.fillStyle = '#ff4d6d';
+      bgCtx.font = `${h.size}px serif`;
+      bgCtx.fillText('♥', h.x, h.y);
+    });
+    requestAnimationFrame(animateBgHearts);
+  }
+  animateBgHearts();
+
+  // ============ ЗВУКОВЫЕ ЭФФЕКТЫ ============
+  let audioContext = null;
+  
+  function initAudioContext() {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  }
+  
+  function playPop() {
+    try {
+      initAudioContext();
+      
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Приятный звук "поп"
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.15);
+    } catch (e) {
+      console.log('Звук недоступен:', e);
+    }
+  }
+
+  // ============ ИГРА: ПОЙМАЙ СЕРДЕЧКИ ============
+  const gameArea = document.getElementById('gameArea');
+  const scoreEl = document.getElementById('score');
+  const timerEl = document.getElementById('timer');
+  const restartBtn = document.getElementById('restartGame');
+
+  let score = 0;
+  let timeLeft = 30;
+  let gameTimer = null;
+  let spawnTimer = null;
+  let gameStarted = false;
+
+  function startGame() {
+    score = 0;
+    timeLeft = 30;
+    scoreEl.textContent = score;
+    timerEl.textContent = timeLeft;
+    gameArea.innerHTML = '';
+    restartBtn.style.display = 'none';
+
+    gameTimer = setInterval(() => {
+      timeLeft--;
+      timerEl.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        endGame();
+      }
+    }, 1000);
+
+    spawnHeart();
+    spawnTimer = setInterval(spawnHeart, 1200);
+  }
+
+  function spawnHeart() {
+    const isGold = Math.random() < 0.15;
+    const heart = document.createElement('div');
+    heart.className = isGold ? 'heart gold' : 'heart';
+    heart.textContent = isGold ? '💛' : '❤️';
+    heart.style.left = (Math.random() * 90 + 5) + '%';
+    heart.style.top = '-60px';
+    
+    // Рандомное слово любви
+    const loveWord = LOVE_WORDS[Math.floor(Math.random() * LOVE_WORDS.length)];
+    
+    // Анимация падения
+    let topPos = -60;
+    const fallSpeed = 1 + Math.random() * 1.5;
+    const fallInterval = setInterval(() => {
+      topPos += fallSpeed;
+      heart.style.top = topPos + 'px';
+      if (topPos > gameArea.offsetHeight) {
+        clearInterval(fallInterval);
+        if (heart.parentNode) heart.remove();
+      }
+    }, 16);
+
+    heart.addEventListener('click', () => {
+      clearInterval(fallInterval);
+      const points = isGold ? 3 : 1;
+      score += points;
+      scoreEl.textContent = score;
+      playPop();
+      
+      // Улучшенная анимация клика с вибрацией
+      heart.style.transition = 'all 0.3s ease';
+      heart.style.transform = 'translate(-50%, -50%) scale(1.5) rotate(15deg)';
+      heart.style.filter = 'brightness(1.8) drop-shadow(0 0 10px rgba(255,77,109,0.8))';
+      
+      // Создаём частицы вокруг сердечка
+      for (let i = 0; i < 8; i++) {
+        const particle = document.createElement('div');
+        particle.textContent = '✨';
+        particle.style.position = 'absolute';
+        particle.style.left = heart.style.left;
+        particle.style.top = heart.style.top;
+        particle.style.fontSize = '20px';
+        particle.style.pointerEvents = 'none';
+        particle.style.transition = 'all 0.6s ease-out';
+        gameArea.appendChild(particle);
+        
+        const angle = (Math.PI * 2 * i) / 8;
+        const distance = 50;
+        setTimeout(() => {
+          particle.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
+          particle.style.opacity = '0';
+        }, 10);
+        setTimeout(() => particle.remove(), 600);
+      }
+      
+      // Показать слово любви
+      const popup = document.createElement('div');
+      popup.className = 'wordPopup';
+      popup.textContent = loveWord;
+      popup.style.left = heart.style.left;
+      popup.style.top = heart.style.top;
+      popup.style.fontSize = '18px';
+      popup.style.fontWeight = '800';
+      gameArea.appendChild(popup);
+      setTimeout(() => {
+        popup.style.opacity = '1';
+        popup.style.transform = 'translate(-50%, -50px) scale(1.2)';
+      }, 10);
+      setTimeout(() => {
+        popup.style.opacity = '0';
+        popup.style.transform = 'translate(-50%, -70px) scale(0.8)';
+      }, 400);
+      setTimeout(() => popup.remove(), 800);
+
+      setTimeout(() => heart.remove(), 200);
+
+      if (score >= 10) {
+        endGame(true);
+      }
+    });
+
+    gameArea.appendChild(heart);
+  }
+
+  function endGame(won = false) {
+    clearInterval(gameTimer);
+    clearInterval(spawnTimer);
+    gameTimer = null;
+    spawnTimer = null;
+
+    if (won) {
+      setTimeout(() => show('secret'), 400);
+    } else {
+      alert('Время вышло! Попробуй ещё раз 😊');
+      restartBtn.style.display = 'inline-block';
+    }
+  }
+
+  restartBtn.addEventListener('click', () => {
+    startGame();
+  });
+
+  // ============ СЕКРЕТНЫЙ ВОПРОС 1 ============
+  const secretInput = document.getElementById('secretInput');
+  const secretBtn = document.getElementById('secretBtn');
+  const secretFeedback = document.getElementById('secretFeedback');
+  const secretHint = document.getElementById('secretHint');
+  let secretAttempts = 0;
+
+  secretBtn.addEventListener('click', () => {
+    const answer = secretInput.value.trim().toLowerCase();
+    if (answer === SECRET_ANSWER.toLowerCase()) {
+      secretFeedback.textContent = '✅ Правильно! Твои глаза — это первое, что меня покорило 💕';
+      secretFeedback.style.color = '#4caf50';
+      playPop();
+      setTimeout(() => show('slider'), 800);
+    } else {
+      secretAttempts++;
+      secretFeedback.textContent = '❌ Не совсем... Попробуй ещё раз!';
+      secretFeedback.style.color = 'var(--accent)';
+      secretInput.value = '';
+      secretInput.focus();
+      
+      if (secretAttempts >= 3) {
+        secretHint.style.display = 'block';
+      }
+    }
+  });
+
+  secretInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') secretBtn.click();
+  });
+
+  // ============ ПОЛЗУНОК ============
+  const loveSlider = document.getElementById('loveSlider');
+  const sliderProgress = document.getElementById('sliderProgress');
+  const runnerEmoji = document.getElementById('runnerEmoji');
+  const sliderFeedback = document.getElementById('sliderFeedback');
+
+  loveSlider.addEventListener('input', (e) => {
+    const value = e.target.value;
+    sliderProgress.style.width = value + '%';
+    runnerEmoji.style.left = `calc(${value}% - 25px)`;
+    
+    if (value >= 99) {
+      sliderFeedback.textContent = '💕 Ура! Ты добежал до меня!';
+      sliderFeedback.style.color = '#4caf50';
+      playPop();
+      setTimeout(() => show('secret2'), 800);
+    } else if (value > 50) {
+      sliderFeedback.textContent = '🏃‍♂️ Почти там...';
+      sliderFeedback.style.color = '#ff9800';
+    }
+  });
+
+  // ============ СЕКРЕТНЫЙ ВОПРОС 2 ============
+  const secret2Input = document.getElementById('secret2Input');
+  const secret2Btn = document.getElementById('secret2Btn');
+  const secret2Feedback = document.getElementById('secret2Feedback');
+
+  secret2Btn.addEventListener('click', () => {
+    const answer = secret2Input.value.trim().toLowerCase().replace(/[.!]/g, '');
+    if (answer === SECRET_ANSWER_2.toLowerCase()) {
+      secret2Feedback.textContent = '✅ Всегда была и всегда будет 🌙💕';
+      secret2Feedback.style.color = '#4caf50';
+      playPop();
+      setTimeout(() => {
+        show('reveal');
+        startTypewriter();
+      }, 800);
+    } else {
+      secret2Feedback.textContent = '❌ Подумай ещё раз...';
+      secret2Feedback.style.color = 'var(--accent)';
+      secret2Input.value = '';
+      secret2Input.focus();
+    }
+  });
+
+  secret2Input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') secret2Btn.click();
+  });
+
+  // ============ ОБРАТНЫЙ ОТСЧЁТ ============
+  const countValEl = document.getElementById('countVal');
+  let countdownInterval = null;
+
+  function startCountdown(seconds, cb) {
+    show('countdown');
+    let s = seconds;
+    countValEl.textContent = s;
+    if (countdownInterval) clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+      s--;
+      if (s <= 0) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+        cb();
+      } else {
+        countValEl.textContent = s;
+      }
+    }, 1000);
+  }
+
+  // ============ ЭФФЕКТ ПЕЧАТИ ============
+  const typeEl = document.getElementById('typewriter');
+  const revealText = 'Я хотел сказать тебе кое-что...\nКаждый день с тобой — это маленькое чудо. Ты — моё вдохновение.';
+
+  function startTypewriter() {
+    typeEl.textContent = '';
+    let i = 0;
+    function tick() {
+      const ch = revealText[i++];
+      if (ch === '\n') typeEl.innerHTML += '<br/>';
+      else typeEl.innerHTML += ch;
+      if (i < revealText.length) {
+        setTimeout(tick, 42 + Math.random() * 40);
+      } else {
+        setTimeout(() => { 
+          startCountdown(3, () => {
+            show('final');
+          });
+        }, 900);
+      }
+    }
+    tick();
+  }
+
+  // ============ ГЛАВНЫЙ ВОПРОС ============
+  const yesBtn = document.getElementById('yesBtn');
+  const noBtn = document.getElementById('noBtn');
+  const messages = ['Точно нет? 😢', 'Подумай ещё…', 'Ну пожааалуйста 💔', 'Я старался…', 'Последний шанс 🥺'];
+  let messageIndex = 0, yesScale = 1;
+
+  function handleNoClick() {
+    const headerRect = document.querySelector('.page').getBoundingClientRect();
+    const nx = headerRect.left + 40 + Math.random() * (headerRect.width - 80);
+    const ny = headerRect.top + 40 + Math.random() * (headerRect.height - 80);
+    noBtn.style.position = 'fixed';
+    noBtn.style.left = nx + 'px';
+    noBtn.style.top = ny + 'px';
+    noBtn.textContent = messages[messageIndex];
+    messageIndex = (messageIndex + 1) % messages.length;
+    yesScale *= 1.25;
+    yesBtn.style.transform = `scale(${yesScale})`;
+    yesBtn.style.boxShadow = '0 10px 30px rgba(255,59,107,0.22)';
+    setTimeout(() => yesBtn.style.transform = `scale(${Math.max(1, yesScale - 0.06)})`, 180);
+  }
+
+  noBtn.addEventListener('click', handleNoClick);
+
+  // ============ КОНФЕТТИ ============
+  const confettiCanvas = document.getElementById('confettiCanvas');
+  const ctx = confettiCanvas.getContext('2d');
+  let confettiPieces = [];
+
+  function resizeConfetti() {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeConfetti);
+  resizeConfetti();
+
+  function spawnConfetti(count) {
+    confettiCanvas.style.display = 'block';
+    for (let i = 0; i < count; i++) {
+      confettiPieces.push({
+        x: Math.random() * confettiCanvas.width,
+        y: -10 - Math.random() * 100,
+        vx: (Math.random() - 0.5) * 6,
+        vy: 2 + Math.random() * 4,
+        r: (Math.random() * 8) + 4,
+        color: ['#ff4d6d', '#ffd166', '#ffb3c6', '#ff7aa2'][Math.floor(Math.random() * 4)],
+        rot: Math.random() * 360,
+        vr: (Math.random() - 0.5) * 8
+      });
+    }
+    if (!confettiLoop) confettiLoop = requestAnimationFrame(confettiTick);
+  }
+
+  let confettiLoop = null;
+  function confettiTick() {
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    for (let i = 0; i < confettiPieces.length; i++) {
+      const p = confettiPieces[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.06;
+      p.rot += p.vr;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 0.6);
+      ctx.restore();
+      if (p.y > confettiCanvas.height + 50) {
+        confettiPieces.splice(i, 1);
+        i--;
+      }
+    }
+    if (confettiPieces.length) confettiLoop = requestAnimationFrame(confettiTick);
+    else {
+      cancelAnimationFrame(confettiLoop);
+      confettiLoop = null;
+      confettiCanvas.style.display = 'none';
+    }
+  }
+
+  yesBtn.addEventListener('click', () => {
+    spawnConfetti(160);
+    playPop();
+    setTimeout(() => {
+      show('slideshow');
+      startSlideshow();
+      document.getElementById('letter').classList.add('visible');
+    }, 420);
+  });
+
+  // ============ СЛАЙДШОУ ============
+  const slides = document.getElementById('slides');
+  const dotsWrap = document.getElementById('dots');
+  const slideCount = slides.children.length;
+  let cur = 0, slideTimer = null;
+
+  function buildDots() {
+    dotsWrap.innerHTML = '';
+    for (let i = 0; i < slideCount; i++) {
+      const d = document.createElement('div');
+      d.className = 'dot';
+      d.dataset.i = i;
+      d.addEventListener('click', () => goTo(i));
+      dotsWrap.appendChild(d);
+    }
+    dotsWrap.children[0].classList.add('active');
+  }
+
+  function updateDots() {
+    Array.from(dotsWrap.children).forEach((d, idx) => d.classList.toggle('active', idx === cur));
+  }
+
+  function goTo(i) {
+    cur = (i + slideCount) % slideCount;
+    slides.style.transform = `translateX(-${cur * 100}%)`;
+    updateDots();
+  }
+
+  function startSlideshow() {
+    if (slideTimer) return;
+    buildDots();
+    slideTimer = setInterval(() => { goTo(cur + 1); }, 3600);
+  }
+
+  // ============ ЗАПУСК ============
+  document.getElementById('startBtn').addEventListener('click', () => {
+    // Инициализируем аудио контекст при первом взаимодействии
+    initAudioContext();
+    
+    gameStarted = true;
+    show('game');
+    startGame();
+    if (bgm) {
+      try { bgm.play(); } catch (e) { }
+    }
+  });
+
+  // Секретная комбинация клавиш для автозаполнения (для тестирования)
+  window.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'k') {
+      document.getElementById('secretInput').value = SECRET_ANSWER;
+      document.getElementById('secret2Input').value = SECRET_ANSWER_2;
+      document.getElementById('loveSlider').value = 100;
+      loveSlider.dispatchEvent(new Event('input'));
+    }
+  });
+  </script>
+</body>
+</html>
