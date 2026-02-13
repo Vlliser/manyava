@@ -3,136 +3,133 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Твоя валентинка — интерактив</title>
+  <title>Для моей Малечки от Джаки — интерактив</title>
   <style>
     :root{
-      --bg-pink: #ffeef6;
+      --bg-pink:#ffdff0;
       --accent:#ff2f5f;
       --muted:#6b6b6b;
-      --glass: rgba(255,255,255,0.78);
+      --glass: rgba(255,255,255,0.62);
       --max-width:980px;
       font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
     }
-    html,body{height:100%;margin:0;background:var(--bg-pink);display:flex;align-items:center;justify-content:center;word-break:break-word;overflow-x:hidden}
+    html,body{height:100%;margin:0;background:var(--bg-pink);display:flex;align-items:center;justify-content:center;overflow-x:hidden}
     *,*::before,*::after{box-sizing:border-box}
-    /* background particle canvas is now under page (z-index:0) */
+
+    /* BACKGROUND PARTICLES - behind everything */
     #bgHearts{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0}
-    .page{width:calc(100% - 20px);max-width:var(--max-width);background:var(--glass);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,0.10);overflow:hidden;position:relative;margin:10px;z-index:2}
-    header{padding:12px 16px;display:flex;flex-direction:column;gap:8px}
-    h1{margin:0;color:var(--accent);font-size:18px}
-    h2{font-size:22px;color:#333;margin:8px 0}
-    h3{font-size:18px;color:#333;margin:6px 0}
-    p{font-size:16px;color:var(--muted);line-height:1.45}
+
+    /* main card (semi-transparent so background is visible) */
+    .page{width:calc(100% - 20px);max-width:var(--max-width);background:var(--glass);border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,0.08);overflow:hidden;position:relative;margin:10px;z-index:2}
+
+    header{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand h1{margin:0;font-size:16px;color:var(--accent);line-height:1}
+    .brand p{margin:0;font-size:13px;color:var(--muted);opacity:0.95}
+
     main{padding:12px}
+    h2{font-size:20px;margin:8px 0}
+    h3{font-size:18px;margin:6px 0}
+    p{font-size:15px;color:var(--muted);line-height:1.45}
+
     .center{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-    button.primary{background:var(--accent);color:white;border:none;padding:12px 18px;border-radius:12px;font-size:16px;cursor:pointer;font-weight:600;min-height:44px;min-width:120px}
+    button.primary{background:var(--accent);color:white;border:none;padding:12px 18px;border-radius:12px;font-size:16px;cursor:pointer;font-weight:600;min-height:44px}
     button.ghost{background:transparent;border:2px solid rgba(255,59,107,0.12);padding:10px 12px;border-radius:10px;font-size:14px;cursor:pointer}
+
     .screen{display:none;padding:10px}
     .screen.active{display:block}
-    #gameArea{position:relative;height:220px;border-radius:12px;background:linear-gradient(180deg,#fff 0%,#fff5f8 100%);overflow:hidden;border:1px solid rgba(255,59,107,0.06)}
-    .heart{position:absolute;width:46px;height:46px;cursor:pointer;transform:translate(-50%,-50%);transition:transform 0.14s ease, filter 140ms}
-    .heart.gold{font-size:54px;filter:drop-shadow(0 6px 18px rgba(255,180,90,0.25))}
-    .hud{display:flex;gap:10px;align-items:center;margin-top:10px;justify-content:center;font-size:14px;flex-wrap:wrap}
+
+    /* Game area */
+    #gameArea{position:relative;height:220px;border-radius:12px;background:linear-gradient(180deg,#fff 0%,#fff7fb 100%);overflow:hidden;border:1px solid rgba(0,0,0,0.03)}
+    .heart{position:absolute;width:46px;height:46px;cursor:pointer;transform:translate(-50%,-50%);transition:transform .12s ease,opacity .2s}
+    .heart.gold{font-size:54px}
+    .hud{display:flex;gap:10px;align-items:center;margin-top:10px;justify-content:center;font-size:14px}
+
     .inputRow{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
     input[type=text]{padding:12px;border-radius:10px;border:1px solid #eee;min-width:200px;font-size:15px;flex:1;min-width:140px;max-width:420px}
+
     .ynWrap{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:16px;flex-wrap:wrap}
     #noBtn{opacity:0.95;filter:grayscale(0.05);padding:10px 14px}
-    #yesBtn{background:var(--accent);color:#fff;padding:12px 20px;border-radius:999px;border:none;font-weight:700;cursor:pointer;transition:transform .12s ease, box-shadow .12s ease;min-height:44px}
+    #yesBtn{background:var(--accent);color:#fff;padding:12px 20px;border-radius:999px;border:none;font-weight:700;cursor:pointer;transition:transform .12s ease, box-shadow .12s ease}
+
+    /* slideshow */
     .slideshow{max-width:760px;margin:0 auto;border-radius:12px;overflow:hidden;position:relative;width:100%}
     .slides{display:flex;transition:transform .55s ease}
     .slide{min-width:100%;height:300px;background-position:center;background-size:cover}
     .slideNav{position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center;gap:8px}
     .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.85);opacity:0.6;cursor:pointer}
     .dot.active{transform:scale(1.2);opacity:1}
-    .letter{padding:14px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.98));margin-top:10px;opacity:0;transform:translateY(6px);transition:opacity .45s ease, transform .45s ease;font-size:15px;line-height:1.6}
+
+    .letter{padding:14px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.95),rgba(255,255,255,0.98));margin-top:10px;opacity:0;transform:translateY(6px);transition:opacity .45s ease, transform .45s ease;font-size:15px;line-height:1.6}
     .letter.visible{opacity:1;transform:translateY(0)}
-    .playerWrap{display:flex;gap:10px;align-items:center;justify-content:space-between;width:100%;margin-top:6px}
-    .playerControls{display:none;align-items:center;gap:8px;flex-wrap:wrap}
-    .playerControls button{padding:8px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:white;font-size:13px}
-    .volume{width:110px}
-    .wordPopup{position:absolute;pointer-events:none;font-weight:700;color:#ff2f5f;text-shadow:0 2px 6px rgba(0,0,0,0.12);transform:translate(-50%,0);opacity:0;transition:opacity .45s, transform .45s;font-size:14px}
-    .revealBox{max-width:700px;margin:0 auto;padding:16px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.95),rgba(255,255,255,1));box-shadow:0 8px 30px rgba(0,0,0,0.06)}
-    .typewriter{font-size:18px;color:#333;min-height:40px;line-height:1.6}
-    footer{display:none} /* убрали подсказку внизу как просил */
-    /* slider runner stage */
+
+    /* word popup should be above everything */
+    .wordPopup{position:fixed;pointer-events:none;font-weight:700;color:#ff2f5f;text-shadow:0 3px 8px rgba(0,0,0,0.12);transform:translate(-50%,0);opacity:0;transition:opacity .35s, transform .35s;font-size:14px;z-index:10005}
+
+    /* Slider stage - new look: white track, pink progress, heart trail */
     .sliderStage{width:100%;max-width:720px;margin:0 auto;padding:12px}
-    .track{position:relative;height:140px;border-radius:12px;background-size:cover;background-position:left center;overflow:hidden;border:1px solid rgba(0,0,0,0.04)}
-    .runner{position:absolute;bottom:8px;left:8px;width:96px;height:96px;background-size:contain;background-repeat:no-repeat;pointer-events:none;transform:translateX(0)}
+    .track{position:relative;height:120px;border-radius:12px;background:#fff;overflow:hidden;border:1px solid rgba(0,0,0,0.04)}
+    .progressBar{position:absolute;left:0;top:0;height:100%;width:0;background:linear-gradient(90deg, rgba(255,77,109,0.18), rgba(255,77,109,0.28));pointer-events:none}
+    .heartTrail{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+    .heartTrail .t{position:absolute;font-size:18px;transform:translate(-50%,-50%);opacity:0;transition:transform .9s ease, opacity .9s}
+    .runner{position:absolute;bottom:8px;left:8px;width:96px;height:96px;background-size:contain;background-repeat:no-repeat;pointer-events:none;transition:transform .12s linear}
     .rangeWrap{display:flex;align-items:center;gap:10px;margin-top:12px}
-    .rangeWrap input[type=range]{flex:1;accent-color:var(--accent);height:28px}
-    /* small screens */
+
+    /* small screens adjustments */
     @media (max-width:768px){
       :root{--max-width:100%}
-      .page{width:100%;border-radius:0;margin:0;min-height:100vh;box-shadow:none}
-      h1{font-size:16px}
-      h2{font-size:20px}
-      p{font-size:15px}
-      main{padding:12px}
+      .page{width:100%;border-radius:0;margin:0;min-height:100vh}
       .slide{height:220px}
       #gameArea{height:180px}
-      .letter{font-size:14px}
-      .runner{width:80px;height:80px}
-      .track{height:120px}
+      .runner{width:72px;height:72px}
+      .track{height:100px}
     }
     @media (max-width:480px){
-      h1{font-size:15px}
       .slide{height:180px}
       #gameArea{height:160px}
       input[type=text]{font-size:14px;padding:10px}
-      .runner{width:64px;height:64px}
-      .track{height:100px}
+      .runner{width:60px;height:60px}
+      .track{height:92px}
     }
-    /* touch improvements */
-    @media (hover:none) and (pointer:coarse){
-      button{padding-bottom:calc(var(--safe-area-inset-bottom) + 1px)}
-      input[type=text]{font-size:16px}
-    }
-    /* confetti remains on top */
+
+    /* confetti on top */
     #confettiCanvas{position:fixed;left:0;top:0;pointer-events:none;z-index:9999;display:none}
   </style>
 </head>
 <body>
-  <!-- background particle canvas (under .page) -->
   <canvas id="bgHearts"></canvas>
 
   <div class="page" role="application" aria-label="Интерактивная валентинка">
     <header>
-      <div style="display:flex;gap:10px;align-items:center;width:100%;justify-content:space-between">
-        <div style="display:flex;gap:10px;align-items:center">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M12 21s-7.5-4.35-9.5-7.25C-0.85 8.55 5 3.5 8.5 6.25 10.2 7.6 12 9 12 9s1.8-1.4 3.5-2.75C19 3.5 24.85 8.55 21.5 13.75 19.5 16.65 12 21 12 21z" fill="#FF4D6D"/>
-          </svg>
-          <div>
-            <h1>Для моей единственной</h1>
-            <div style="color:var(--muted);font-size:13px">Проходи этапы и увидишь письмо</div>
-          </div>
+      <div class="brand">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M12 21s-7.5-4.35-9.5-7.25C-0.85 8.55 5 3.5 8.5 6.25 10.2 7.6 12 9 12 9s1.8-1.4 3.5-2.75C19 3.5 24.85 8.55 21.5 13.75 19.5 16.65 12 21 12 21z" fill="#FF4D6D"/>
+        </svg>
+        <div>
+          <h1>для моей Малечки от Джаки</h1>
+          <p>прошагай игру — и получишь письмо 💌</p>
         </div>
-        <div class="playerWrap" style="flex:0 0 auto">
-          <button id="musicToggle" class="ghost" aria-expanded="false">🎵 Плеер</button>
-          <div id="playerControls" class="playerControls" aria-hidden="true">
-            <button id="playBtn" class="ghost">▶ Играть</button>
-            <button id="pauseBtn" class="ghost">⏸ Пауза</button>
-            <button id="stopBtn" class="ghost">⏹ Стоп</button>
-            <input id="volRange" class="volume" type="range" min="0" max="100" value="45" aria-label="Громкость" />
-            <!-- Upload track fallback -->
-            <label class="ghost" for="audioUpload" style="cursor:pointer">⬆️ Загрузить трек</label>
-            <input id="audioUpload" type="file" accept="audio/*" style="display:none" />
-          </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button id="musicToggle" class="ghost" aria-expanded="false">🎵 Плеер</button>
+        <div id="playerControls" class="playerControls" aria-hidden="true">
+          <button id="playBtn" class="ghost">▶</button>
+          <button id="pauseBtn" class="ghost">⏸</button>
+          <button id="stopBtn" class="ghost">⏹</button>
+          <input id="volRange" class="volume" type="range" min="0" max="100" value="45" />
+          <label class="ghost" for="audioUpload" style="cursor:pointer">⬆️ Загрузить трек</label>
+          <input id="audioUpload" type="file" accept="audio/*" style="display:none" />
         </div>
       </div>
     </header>
 
     <main>
-      <!-- Landing -->
       <section id="landing" class="screen active center">
         <h2>Хочешь сыграть? ❤️</h2>
         <p>Нажми <strong>Начать</strong> — будет мило и романтично 💕</p>
         <button id="startBtn" class="primary">Начать</button>
       </section>
 
-      <!-- Game -->
       <section id="game" class="screen">
         <h3 style="text-align:center">Поймай <span id="targetNum">6</span> сердечек!</h3>
         <div id="gameArea" aria-live="polite"></div>
@@ -145,7 +142,6 @@
         </div>
       </section>
 
-      <!-- Secret question (changed) -->
       <section id="secret" class="screen center">
         <h3>🔐 Секретный вопрос</h3>
         <p>Луна сегодня красивая, не так ли?</p>
@@ -156,12 +152,12 @@
         <div id="secretMsg" style="margin-top:8px;color:var(--muted);font-size:14px"></div>
       </section>
 
-      <!-- Slider stage (заменяет пароль) -->
       <section id="sliderStage" class="screen center">
         <h3>🕊 Поможешь мне добежать до тебя?</h3>
-        <!-- track background: заменяй URL на свою картинку с дорожкой/фоном; runner — картинка парня -->
         <div class="sliderStage">
-          <div class="track" id="track" style="background-image: url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1400&q=80&auto=format&fit=crop');">
+          <div class="track" id="track">
+            <div class="progressBar" id="progressBar"></div>
+            <div class="heartTrail" id="heartTrail"></div>
             <div class="runner" id="runner" style="background-image:url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=80&auto=format&fit=crop')"></div>
           </div>
           <div class="rangeWrap" style="width:100%">
@@ -172,7 +168,6 @@
         </div>
       </section>
 
-      <!-- Reveal (typewriter) -->
       <section id="reveal" class="screen center">
         <div class="revealBox">
           <div class="typewriter" id="typewriter"> </div>
@@ -180,7 +175,6 @@
         </div>
       </section>
 
-      <!-- Final -->
       <section id="final" class="screen center">
         <h3>Будешь ли ты моей валентинкой? 💌</h3>
         <div class="ynWrap">
@@ -189,7 +183,6 @@
         </div>
       </section>
 
-      <!-- Slideshow + Letter -->
       <section id="slideshow" class="screen center">
         <h3>💝 Для тебя — моё письмо</h3>
         <div class="slideshow" aria-live="polite">
@@ -208,315 +201,90 @@
         </div>
       </section>
     </main>
-
   </div>
 
-  <!-- confetti canvas on top -->
   <canvas id="confettiCanvas"></canvas>
 
   <script>
-  /* ====== Настройки (редактируй тут) ====== */
-  const SECRET_ANSWER = "всегда"; // принимается: 'всегда' или 'всегда.'
-  const KNOWN_PASSWORD = ""; // теперь не используется (оставлено для совместимости)
   const GAME_TARGET = 6;
   const FLOATING_WORDS = ['улыбка','обниму','тёпло','счастье','поцелуй','люблю','твой смех','навсегда'];
-  /* ======================================== */
 
-  /* --- Background particle canvas (now behind .page) --- */
+  /* BG hearts */
   const bgCanvas = document.getElementById('bgHearts');
   const bgCtx = bgCanvas.getContext && bgCanvas.getContext('2d');
   let bgParticles = [];
   function resizeBg(){ bgCanvas.width = innerWidth; bgCanvas.height = innerHeight; }
-  window.addEventListener('resize', resizeBg);
-  resizeBg();
-  function spawnBgParticle(){
-    bgParticles.push({
-      x: Math.random()*bgCanvas.width,
-      y: -30 - Math.random()*80,
-      vx: (Math.random()-0.5)*0.25,
-      vy: 0.4 + Math.random()*0.6,
-      size: 10 + Math.random()*18,
-      rot: Math.random()*360,
-      vr: (Math.random()-0.5)*0.6,
-      alpha: 0.35 + Math.random()*0.6
-    });
-  }
-  for(let i=0;i<30;i++) spawnBgParticle();
-  function bgTick(){
-    if(!bgCtx) return;
-    bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
-    for(let i=0;i<bgParticles.length;i++){
-      const p = bgParticles[i];
-      p.x += p.vx; p.y += p.vy; p.rot += p.vr;
-      bgCtx.save();
-      // soft glow: draw with fill + slight outer blur effect via globalAlpha
-      bgCtx.globalAlpha = p.alpha;
-      bgCtx.translate(p.x,p.y);
-      bgCtx.rotate(p.rot*Math.PI/180);
-      bgCtx.beginPath();
-      bgCtx.fillStyle = 'rgba(255,255,255,0.85)'; // white-ish on pink gives contrast
-      bgCtx.arc(-p.size*0.28,0,p.size*0.45,0,Math.PI*2);
-      bgCtx.arc(p.size*0.28,0,p.size*0.45,0,Math.PI*2);
-      bgCtx.moveTo(-p.size,0); bgCtx.quadraticCurveTo(0,p.size*1.1,p.size,0);
-      bgCtx.fill();
-      bgCtx.restore();
-      if(p.y > bgCanvas.height + 50){ bgParticles.splice(i,1); i--; }
-    }
-    if(Math.random()<0.06) spawnBgParticle();
-    requestAnimationFrame(bgTick);
-  }
+  window.addEventListener('resize', resizeBg); resizeBg();
+  function spawnBgParticle(){ bgParticles.push({ x: Math.random()*bgCanvas.width, y:-40-Math.random()*80, vx:(Math.random()-0.5)*0.25, vy:0.4+Math.random()*0.6, size:10+Math.random()*20, rot:Math.random()*360, vr:(Math.random()-0.5)*0.6, alpha:0.4+Math.random()*0.6 }); }
+  for(let i=0;i<26;i++) spawnBgParticle();
+  function bgTick(){ if(!bgCtx) return; bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height); for(let i=0;i<bgParticles.length;i++){ const p=bgParticles[i]; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; bgCtx.save(); bgCtx.globalAlpha = p.alpha; bgCtx.translate(p.x,p.y); bgCtx.rotate(p.rot*Math.PI/180); bgCtx.beginPath(); bgCtx.fillStyle = 'rgba(255,255,255,0.95)'; bgCtx.arc(-p.size*0.28,0,p.size*0.45,0,Math.PI*2); bgCtx.arc(p.size*0.28,0,p.size*0.45,0,Math.PI*2); bgCtx.moveTo(-p.size,0); bgCtx.quadraticCurveTo(0,p.size*1.1,p.size,0); bgCtx.fill(); bgCtx.lineWidth = Math.max(0.6, p.size*0.03); bgCtx.strokeStyle = 'rgba(255,77,109,0.08)'; bgCtx.stroke(); bgCtx.restore(); if(p.y>bgCanvas.height+40){ bgParticles.splice(i,1); i--; } } if(Math.random()<0.06) spawnBgParticle(); requestAnimationFrame(bgTick); }
   requestAnimationFrame(bgTick);
 
-  /* --- Simple helpers & screens --- */
-  const screens = () => document.querySelectorAll('.screen');
-  function show(id){
-    screens().forEach(s=>s.classList.remove('active'));
-    const el = document.getElementById(id);
-    if(el) el.classList.add('active');
-    // accessibility: playerControls visibility toggles aria attributes
-    const pc = document.getElementById('playerControls');
-    if(pc && pc.style.display==='flex') musicToggle.setAttribute('aria-expanded','true'); else musicToggle.setAttribute('aria-expanded','false');
-  }
+  /* screens helper */
+  const screens = ()=>document.querySelectorAll('.screen'); function show(id){ screens().forEach(s=>s.classList.remove('active')); const el=document.getElementById(id); if(el) el.classList.add('active'); }
 
-  /* --- Audio: SoundCloud iframe + upload fallback --- */
-  let bgm = null;
-  let scWidget = null;
-  let scReady = false;
-  const MUSIC_SC_URL = null; // если хочешь использовать, впиши сюда URL; по умолчанию null (мы используем загрузку)
-  const musicToggle = document.getElementById('musicToggle');
-  // show controls panel when widget ready or when user uploads
-  function enablePlayerControls(){ const pc = document.getElementById('playerControls'); pc.style.display='flex'; pc.setAttribute('aria-hidden','false'); }
+  /* audio upload fallback */
+  let bgm=null; const audioUpload = document.getElementById('audioUpload');
+  audioUpload.addEventListener('change', e=>{ const f=e.target.files[0]; if(!f) return; const url=URL.createObjectURL(f); if(bgm){ bgm.pause(); bgm.src=''; bgm=null; } bgm=new Audio(url); bgm.loop=true; bgm.volume=document.getElementById('volRange').value/100; alert('Трек загружен — нажми ▶ чтобы воспроизвести.'); document.getElementById('playerControls').style.display='flex'; document.getElementById('playerControls').setAttribute('aria-hidden','false'); });
+  document.getElementById('musicToggle').addEventListener('click', ()=>{ const pc=document.getElementById('playerControls'); pc.style.display = (pc.style.display==='flex')? 'none':'flex'; });
+  document.getElementById('playBtn').addEventListener('click', ()=>{ if(bgm){ bgm.play().catch(()=>{}); } else alert('Загрузите трек через кнопку «Загрузить трек»'); });
+  document.getElementById('pauseBtn').addEventListener('click', ()=>{ if(bgm) bgm.pause(); });
+  document.getElementById('stopBtn').addEventListener('click', ()=>{ if(bgm){ bgm.pause(); bgm.currentTime=0; } });
+  document.getElementById('volRange').addEventListener('input', e=>{ const v=+e.target.value; if(bgm) bgm.volume=v/100; });
 
-  // If you want to use SoundCloud widget you can set MUSIC_SC_URL above.
-  if(MUSIC_SC_URL){
-    const scIframe = document.createElement('iframe');
-    scIframe.id = 'sc-player-iframe';
-    scIframe.style.display='block';
-    scIframe.width = '300';
-    scIframe.height = '80';
-    scIframe.frameBorder = '0';
-    scIframe.allow = 'autoplay';
-    scIframe.src = 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(MUSIC_SC_URL) + '&auto_play=false&hide_related=false&show_comments=false&visual=true';
-    document.querySelector('header').appendChild(scIframe);
-    const scScript = document.createElement('script');
-    scScript.src = 'https://w.soundcloud.com/player/api.js';
-    scScript.onload = () => {
-      try{
-        scWidget = SC.Widget(scIframe);
-        scWidget.bind(SC.Widget.Events.READY, ()=>{ scReady = true; enablePlayerControls(); scWidget.setVolume(45); });
-        scWidget.bind(SC.Widget.Events.PLAY, ()=>{}); scWidget.bind(SC.Widget.Events.PAUSE, ()=>{});
-      }catch(e){ console.warn('SC init', e); }
-    };
-    document.body.appendChild(scScript);
-  } else {
-    // show controls so user can upload mp3
-    enablePlayerControls();
-  }
-
-  // upload file fallback
-  const audioUpload = document.getElementById('audioUpload');
-  audioUpload.addEventListener('change', e=>{
-    const file = e.target.files[0];
-    if(!file) return;
-    const url = URL.createObjectURL(file);
-    if(bgm){ bgm.pause(); bgm.src = ''; bgm = null; }
-    bgm = new Audio(url);
-    bgm.loop = true;
-    bgm.volume = document.getElementById('volRange').value/100;
-    enablePlayerControls();
-    alert('Трек загружен — нажми ▶ чтобы воспроизвести (браузер может попросить взаимодействие).');
-  });
-
-  document.getElementById('musicToggle').addEventListener('click', ()=>{
-    const pc = document.getElementById('playerControls');
-    pc.style.display = (pc.style.display==='flex')? 'none':'flex';
-    musicToggle.textContent = (pc.style.display==='flex')? '⏹ Скрыть':'🎵 Плеер';
-    musicToggle.setAttribute('aria-expanded', pc.style.display==='flex');
-  });
-  document.getElementById('playBtn').addEventListener('click', ()=>{
-    if(scReady && scWidget){ try{ scWidget.play(); }catch(e){} return; }
-    if(bgm){ bgm.play().catch(()=>{}); return; }
-    alert('Загрузите mp3 через «Загрузить трек» или задайте SoundCloud URL в коде.');
-  });
-  document.getElementById('pauseBtn').addEventListener('click', ()=>{ if(scReady && scWidget) scWidget.pause(); else if(bgm) bgm.pause(); });
-  document.getElementById('stopBtn').addEventListener('click', ()=>{ if(scReady && scWidget){ scWidget.seekTo(0); scWidget.pause(); } else if(bgm){ bgm.pause(); bgm.currentTime = 0; } });
-  document.getElementById('volRange').addEventListener('input', e=>{ const v = +e.target.value; if(scReady && scWidget) scWidget.setVolume(v); if(bgm) bgm.volume = v/100; });
-
-  /* --- Game (same but mobile-friendly) --- */
-  const gameArea = document.getElementById('gameArea');
-  const scoreEl = document.getElementById('score');
-  const leftEl = document.getElementById('left');
-  const restartBtn = document.getElementById('restartGame');
-  let score = 0, hearts = [], spawnTimer = null, gameRunning = false;
-
-  function spawnHeart(){
-    const el = document.createElement('div'); el.className='heart';
-    el.style.left = (8 + Math.random()*84) + '%';
-    el.innerHTML = ['❤️','💗','💞'][Math.floor(Math.random()*3)];
-    const startY = -30; let top = startY; el.style.top = top + 'px'; gameArea.appendChild(el); hearts.push(el);
-    const speed = 0.9 + Math.random()*1.3;
-    (function fall(){
-      top += speed; el.style.top = top + 'px';
-      if(top > gameArea.clientHeight + 60){ el.remove(); hearts = hearts.filter(h=>h!==el); return; }
-      requestAnimationFrame(fall);
-    })();
-    el.addEventListener('click', ev=>{
-      playPop();
-      showFloatingWord(ev.clientX, ev.clientY);
-      score++; scoreEl.textContent = score; leftEl.textContent = Math.max(0, GAME_TARGET - score);
-      el.style.transform = 'scale(1.45) rotate(-12deg)'; setTimeout(()=>el.remove(),180);
-      hearts = hearts.filter(h=>h!==el); checkGameWin();
-    });
-  }
-  function startGame(){ score=0; scoreEl.textContent='0'; leftEl.textContent=GAME_TARGET; gameRunning=true;
-    spawnTimer = setInterval(()=>{ spawnHeart(); if(Math.random()>0.66) spawnHeart(); }, 700);
-    setTimeout(()=>{ if(gameRunning) stopGame(); }, 45000);
-  }
-  function stopGame(){ gameRunning=false; clearInterval(spawnTimer); hearts.forEach(h=>h.remove()); hearts = []; }
-  function checkGameWin(){ if(score>=GAME_TARGET){ stopGame(); setTimeout(()=> show('secret'), 500); } }
+  /* GAME */
+  const gameArea = document.getElementById('gameArea'); const scoreEl = document.getElementById('score'); const leftEl = document.getElementById('left'); const restartBtn = document.getElementById('restartGame');
+  let score=0, hearts=[], spawnTimer=null, gameRunning=false;
+  function spawnHeart(){ const el=document.createElement('div'); el.className='heart'; el.style.left=(8+Math.random()*84)+'%'; el.innerHTML=['❤️','💗','💞'][Math.floor(Math.random()*3)]; const startY=-30; let top=startY; el.style.top=top+'px'; gameArea.appendChild(el); hearts.push(el); const speed=0.9+Math.random()*1.3; (function fall(){ top+=speed; el.style.top=top+'px'; if(top>gameArea.clientHeight+60){ el.remove(); hearts=hearts.filter(h=>h!==el); return; } requestAnimationFrame(fall); })(); el.addEventListener('click', ev=>{ playPop(); showFloatingWordFromEvent(ev); score++; scoreEl.textContent=score; leftEl.textContent=Math.max(0,GAME_TARGET-score); el.style.transform='scale(1.45) rotate(-12deg)'; setTimeout(()=>el.remove(),180); hearts=hearts.filter(h=>h!==el); }); }
+  function startGame(){ score=0; scoreEl.textContent='0'; leftEl.textContent=GAME_TARGET; gameRunning=true; spawnTimer=setInterval(()=>{ spawnHeart(); if(Math.random()>0.66) spawnHeart(); },700); setTimeout(()=>{ if(gameRunning) stopGame(); },45000); }
+  function stopGame(){ gameRunning=false; clearInterval(spawnTimer); hearts.forEach(h=>h.remove()); hearts=[]; }
   restartBtn.addEventListener('click', ()=>{ stopGame(); startGame(); });
 
-  /* --- small audio pop (WebAudio) & floating words --- */
-  let audioCtx=null;
-  function ensureAudioCtx(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
-  function playPop(){ try{ ensureAudioCtx(); const t = audioCtx.currentTime; const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='sine'; o.frequency.setValueAtTime(700,t); g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.18,t+0.01); g.gain.exponentialRampToValueAtTime(0.001,t+0.18); o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t+0.18); }catch(e){} }
-  function showFloatingWord(x,y){
-    const w = document.createElement('div'); w.className='wordPopup'; w.textContent = FLOATING_WORDS[Math.floor(Math.random()*FLOATING_WORDS.length)];
-    document.body.appendChild(w); w.style.left = x + 'px'; w.style.top = y + 'px';
-    requestAnimationFrame(()=>{ w.style.opacity = 1; w.style.transform = 'translate(-50%,-28px)'; });
-    setTimeout(()=>{ w.style.opacity = 0; w.style.transform = 'translate(-50%,-68px)'; setTimeout(()=>w.remove(),600); },900);
-  }
+  /* floating words (works with click/touch) */
+  function showFloatingWordFromEvent(ev){ let x,y; if(ev.touches && ev.touches[0]){ x=ev.touches[0].clientX; y=ev.touches[0].clientY; } else { x = ev.clientX || (ev.target && ev.target.getBoundingClientRect().left); y = ev.clientY || (ev.target && ev.target.getBoundingClientRect().top); } const w = document.createElement('div'); w.className='wordPopup'; w.textContent = FLOATING_WORDS[Math.floor(Math.random()*FLOATING_WORDS.length)]; document.body.appendChild(w); w.style.left = x + 'px'; w.style.top = y + 'px'; requestAnimationFrame(()=>{ w.style.opacity=1; w.style.transform='translate(-50%,-30px)'; }); setTimeout(()=>{ w.style.opacity=0; w.style.transform='translate(-50%,-70px)'; setTimeout(()=>w.remove(),600); },900); }
 
-  /* --- Secret: accept 'всегда' or 'всегда.' case-insensitive --- */
-  document.getElementById('secretCheck').addEventListener('click', ()=>{
-    const raw = document.getElementById('secretInput').value.trim();
-    const v = raw.toLowerCase().replace(/\s+/g,'').replace(/[^а-яё.]/gi,''); // normalize
-    const msg = document.getElementById('secretMsg');
-    if(/^всегда\.?$/.test(v)){ msg.textContent = '✅ Верно!'; setTimeout(()=> show('sliderStage'), 700); }
-    else { msg.textContent = '❌ Не тот ответ. Попробуй ещё :)'; }
-  });
+  /* secret check */
+  document.getElementById('secretCheck').addEventListener('click', ()=>{ const raw=document.getElementById('secretInput').value.trim().toLowerCase(); const norm=raw.replace(/\s+/g,''); if(/^всегда\.?$/.test(norm)){ document.getElementById('secretMsg').textContent='✅ Верно!'; setTimeout(()=> show('sliderStage'),700); } else { document.getElementById('secretMsg').textContent='❌ Не тот ответ, попробуй ещё :)'; } });
 
-  /* --- Slider stage: move runner image according to range value --- */
-  const runSlider = document.getElementById('runSlider');
-  const runner = document.getElementById('runner');
-  const track = document.getElementById('track');
-  const runPercent = document.getElementById('runPercent');
-  function updateRunnerByValue(v){
-    // runner should move from left padding to track width - runner width - padding
-    const trackRect = track.getBoundingClientRect();
-    const runnerW = runner.offsetWidth || 80;
-    const padding = 8;
-    const usable = Math.max(1, trackRect.width - runnerW - padding*2);
-    const x = padding + (v/100) * usable;
-    runner.style.transform = `translateX(${x}px)`;
-    runPercent.textContent = Math.round(v) + '%';
-  }
-  runSlider.addEventListener('input', (e)=> updateRunnerByValue(+e.target.value));
-  runSlider.addEventListener('change', (e)=>{
-    const v = +e.target.value;
-    updateRunnerByValue(v);
-    if(v >= 100){
-      // small delay to celebrate
-      playPop();
-      setTimeout(()=>{ show('reveal'); startTypewriter(); }, 420);
-    }
-  });
-  // init runner pos
-  setTimeout(()=> updateRunnerByValue(+runSlider.value), 120);
+  /* slider stage: runner, progress, trail */
+  const runSlider = document.getElementById('runSlider'); const runner = document.getElementById('runner'); const track = document.getElementById('track'); const progressBar = document.getElementById('progressBar'); const heartTrail = document.getElementById('heartTrail'); const runPercent = document.getElementById('runPercent');
+  function updateRunnerByValue(v){ const trackRect = track.getBoundingClientRect(); const runnerW = runner.offsetWidth || 80; const padding = 8; const usable = Math.max(1, trackRect.width - runnerW - padding*2); const x = padding + (v/100) * usable; runner.style.transform = `translateX(${x}px)`; progressBar.style.width = Math.max(2, v) + '%'; runPercent.textContent = Math.round(v) + '%'; }
+  function spawnTrailHeartAt(x,y){ const t=document.createElement('div'); t.className='t'; t.innerHTML='❤'; heartTrail.appendChild(t); t.style.left = x + 'px'; t.style.top = y + 'px'; t.style.opacity = 1; t.style.transform = 'translate(-50%,-50%) scale(1)'; setTimeout(()=>{ t.style.transform = 'translate(-50%,-160%) scale(0.6)'; t.style.opacity = 0; },20); setTimeout(()=>t.remove(),900); }
+  runSlider.addEventListener('input', e=>{ const v=+e.target.value; updateRunnerByValue(v); const trackRect=track.getBoundingClientRect(); const runnerW = runner.offsetWidth || 80; const padding=8; const usable = Math.max(1, trackRect.width - runnerW - padding*2); const x = padding + (v/100)*usable + runnerW/2; const y = trackRect.height/2; spawnTrailHeartAt(x,y); });
+  runSlider.addEventListener('change', e=>{ if(+e.target.value>=100){ playPop(); setTimeout(()=>{ show('reveal'); startTypewriter(); },420); } });
+  window.addEventListener('load', ()=> updateRunnerByValue(+runSlider.value)); window.addEventListener('resize', ()=> updateRunnerByValue(+runSlider.value));
 
-  /* --- Typewriter effect and final flow --- */
-  const typeEl = document.getElementById('typewriter');
-  const revealText = 'Я хотел сказать тебе кое-что...\\nКаждый день с тобой — это маленькое чудо. Ты — моё вдохновение.';
-  function startTypewriter(){
-    typeEl.innerHTML = '';
-    let i = 0;
-    (function tick(){
-      const ch = revealText[i++];
-      if(ch === '\\n') typeEl.innerHTML += '<br/>';
-      else typeEl.innerHTML += ch;
-      if(i < revealText.length) setTimeout(tick, 36 + Math.random()*42);
-      else setTimeout(()=> show('final'), 800);
-    })();
-  }
+  /* typewriter */
+  const typeEl = document.getElementById('typewriter'); const revealText = 'Я хотел сказать тебе кое-что...\\nКаждый день с тобой — это маленькое чудо. Ты — моё вдохновение.';
+  function startTypewriter(){ typeEl.innerHTML=''; let i=0; (function tick(){ const ch=revealText[i++]; if(ch==='\\n') typeEl.innerHTML += '<br/>'; else typeEl.innerHTML += ch; if(i<revealText.length) setTimeout(tick, 36+Math.random()*42); else setTimeout(()=> show('final'),800); })(); }
 
-  /* --- Final: yes/no behavior & confetti --- */
-  const yesBtn = document.getElementById('yesBtn');
-  const noBtn = document.getElementById('noBtn');
-  const messages = ['Точно нет? 😢','Подумай ещё…','Ну пожааалуйста 💔','Я старался…','Последний шанс 🥺'];
-  let msgIndex = 0, yesScale = 1;
-  function handleNoClick(){
-    const pageRect = document.querySelector('.page').getBoundingClientRect();
-    const nx = Math.max(12, pageRect.left + 12 + Math.random()*(pageRect.width - 80));
-    const ny = Math.max(12, pageRect.top + 12 + Math.random()*(pageRect.height - 80));
-    noBtn.style.position = 'fixed'; noBtn.style.left = nx + 'px'; noBtn.style.top = ny + 'px';
-    noBtn.textContent = messages[msgIndex]; msgIndex = (msgIndex+1)%messages.length;
-    yesScale *= 1.25; yesBtn.style.transform = `scale(${yesScale})`; yesBtn.style.boxShadow = '0 10px 30px rgba(255,59,107,0.22)';
-    setTimeout(()=> yesBtn.style.transform = `scale(${Math.max(1, yesScale-0.06)})`, 160);
-  }
+  /* final */
+  const yesBtn = document.getElementById('yesBtn'); const noBtn = document.getElementById('noBtn');
+  function handleNoClick(){ const p=document.querySelector('.page').getBoundingClientRect(); const nx = Math.max(12, p.left + 12 + Math.random()*(p.width-80)); const ny = Math.max(12, p.top + 12 + Math.random()*(p.height-80)); noBtn.style.position='fixed'; noBtn.style.left = nx+'px'; noBtn.style.top = ny+'px'; const messages=['Точно нет? 😢','Подумай ещё…','Ну пожааалуйста 💔','Я старался…','Последний шанс 🥺']; noBtn.textContent = messages.shift(); messages.push(noBtn.textContent); yesBtn.style.transform = `scale(${1.18})`; yesBtn.style.boxShadow = '0 10px 30px rgba(255,59,107,0.22)'; setTimeout(()=> yesBtn.style.transform = 'scale(1)',160); }
   noBtn.addEventListener('click', handleNoClick);
 
-  /* confetti (same as before) */
-  const confettiCanvas = document.getElementById('confettiCanvas');
-  const confettiCtx = confettiCanvas.getContext && confettiCanvas.getContext('2d');
-  function resizeConfetti(){ confettiCanvas.width = innerWidth; confettiCanvas.height = innerHeight; }
-  window.addEventListener('resize', resizeConfetti); resizeConfetti();
-  let confettiPieces = [], confettiLoop = null;
-  function spawnConfetti(count){
-    if(!confettiCtx) return;
-    confettiCanvas.style.display='block';
-    for(let i=0;i<count;i++) confettiPieces.push({
-      x: Math.random()*confettiCanvas.width,
-      y: -10 - Math.random()*100,
-      vx: (Math.random()-0.5)*6,
-      vy: 2 + Math.random()*4,
-      r: (Math.random()*8)+4,
-      color: ['#ff4d6d','#ffd166','#ffb3c6','#ff7aa2'][Math.floor(Math.random()*4)],
-      rot: Math.random()*360,
-      vr: (Math.random()-0.5)*8
-    });
-    if(!confettiLoop) confettiLoop = requestAnimationFrame(confettiTick);
-  }
-  function confettiTick(){
-    confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
-    for(let i=0;i<confettiPieces.length;i++){
-      const p = confettiPieces[i];
-      p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.rot += p.vr;
-      confettiCtx.save(); confettiCtx.translate(p.x,p.y); confettiCtx.rotate(p.rot*Math.PI/180);
-      confettiCtx.fillStyle = p.color; confettiCtx.fillRect(-p.r/2, -p.r/2, p.r, p.r*0.6); confettiCtx.restore();
-      if(p.y > confettiCanvas.height + 50){ confettiPieces.splice(i,1); i--; }
-    }
-    if(confettiPieces.length) confettiLoop = requestAnimationFrame(confettiTick);
-    else { cancelAnimationFrame(confettiLoop); confettiLoop=null; confettiCanvas.style.display='none'; }
-  }
+  /* confetti */
+  const confettiCanvas = document.getElementById('confettiCanvas'); const confettiCtx = confettiCanvas.getContext && confettiCanvas.getContext('2d'); function resizeConfetti(){ confettiCanvas.width = innerWidth; confettiCanvas.height = innerHeight; } window.addEventListener('resize', resizeConfetti); resizeConfetti(); let confettiPieces=[], confettiLoop=null;
+  function spawnConfetti(count){ if(!confettiCtx) return; confettiCanvas.style.display='block'; for(let i=0;i<count;i++) confettiPieces.push({ x:Math.random()*confettiCanvas.width, y:-10-Math.random()*100, vx:(Math.random()-0.5)*6, vy:2+Math.random()*4, r:(Math.random()*8)+4, color:['#ff4d6d','#ffd166','#ffb3c6','#ff7aa2'][Math.floor(Math.random()*4)], rot:Math.random()*360, vr:(Math.random()-0.5)*8 }); if(!confettiLoop) confettiLoop = requestAnimationFrame(confettiTick); }
+  function confettiTick(){ confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height); for(let i=0;i<confettiPieces.length;i++){ const p=confettiPieces[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.06; p.rot+=p.vr; confettiCtx.save(); confettiCtx.translate(p.x,p.y); confettiCtx.rotate(p.rot*Math.PI/180); confettiCtx.fillStyle=p.color; confettiCtx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6); confettiCtx.restore(); if(p.y>confettiCanvas.height+50){ confettiPieces.splice(i,1); i--; } } if(confettiPieces.length) confettiLoop = requestAnimationFrame(confettiTick); else { cancelAnimationFrame(confettiLoop); confettiLoop=null; confettiCanvas.style.display='none'; } }
+  yesBtn.addEventListener('click', ()=>{ spawnConfetti(120); playPop(); setTimeout(()=>{ show('slideshow'); startSlideshow(); document.getElementById('letter').classList.add('visible'); },420); });
 
-  yesBtn.addEventListener('click', ()=>{
-    spawnConfetti(120); playPop();
-    setTimeout(()=> { show('slideshow'); startSlideshow(); document.getElementById('letter').classList.add('visible'); }, 420);
-  });
+  /* pop sound */
+  let audioCtx=null; function ensureAudioCtx(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
+  function playPop(){ try{ ensureAudioCtx(); const t=audioCtx.currentTime; const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sine'; o.frequency.setValueAtTime(700,t); g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.18,t+0.01); g.gain.exponentialRampToValueAtTime(0.001,t+0.18); o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t+0.18); }catch(e){} }
 
-  /* --- Slideshow --- */
-  const slides = document.getElementById('slides');
-  const dotsWrap = document.getElementById('dots');
-  const slideCount = slides.children.length;
-  let cur = 0, slideTimer = null;
-  function buildDots(){ dotsWrap.innerHTML=''; for(let i=0;i<slideCount;i++){ const d=document.createElement('div'); d.className='dot'; d.dataset.i=i; d.addEventListener('click', ()=> goTo(i)); dotsWrap.appendChild(d);} if(dotsWrap.children[0]) dotsWrap.children[0].classList.add('active'); }
+  /* slideshow */
+  const slides = document.getElementById('slides'); const dotsWrap = document.getElementById('dots'); const slideCount = slides.children.length; let cur=0, slideTimer=null;
+  function buildDots(){ dotsWrap.innerHTML=''; for(let i=0;i<slideCount;i++){ const d=document.createElement('div'); d.className='dot'; d.dataset.i=i; d.addEventListener('click', ()=>goTo(i)); dotsWrap.appendChild(d); } if(dotsWrap.children[0]) dotsWrap.children[0].classList.add('active'); }
   function updateDots(){ Array.from(dotsWrap.children).forEach((d,idx)=> d.classList.toggle('active', idx===cur)); }
-  function goTo(i){ cur = (i+slideCount)%slideCount; slides.style.transform = `translateX(-${cur*100}%)`; updateDots(); }
+  function goTo(i){ cur=(i+slideCount)%slideCount; slides.style.transform = `translateX(-${cur*100}%)`; updateDots(); }
   function startSlideshow(){ if(slideTimer) return; buildDots(); slideTimer = setInterval(()=> goTo(cur+1), 3600); }
 
-  /* --- Start button: start game + try to play music on user gesture --- */
-  document.getElementById('startBtn').addEventListener('click', ()=>{
-    show('game'); startGame();
-    // attempt to play bg audio (user gesture)
-    if(scWidget && scReady){ try{ scWidget.play(); }catch(e){} }
-    else if(bgm){ try{ bgm.play(); }catch(e){} }
-  });
+  /* start button */
+  document.getElementById('startBtn').addEventListener('click', ()=>{ show('game'); startGame(); if(bgm){ try{ bgm.play(); }catch(e){} } });
 
-  // expose small helper for dev
-  window.fillCorrect = ()=>{ document.getElementById('secretInput').value = 'всегда'; runSlider.value = 100; updateRunnerByValue(100); };
-
-  // init: ensure runner sized after images load
-  window.addEventListener('load', ()=>{ updateRunnerByValue(+runSlider.value); });
+  // dev helper
+  window.fillCorrect = ()=>{ document.getElementById('secretInput').value='всегда'; runSlider.value=100; updateRunnerByValue(100); };
   </script>
 </body>
 </html>
